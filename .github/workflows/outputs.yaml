@@ -1,5 +1,7 @@
 
-
+name: Outputs
+on:
+  workflow_dispatch:
 jobs:
   say_hello:
     name: "Let's greet the user!"
