@@ -1,0 +1,21 @@
+# Ejercicio 5: Filtros de rama y ruta
+name: Ejercicio 5 - Filtros de rama y ruta
+
+# CLAVE: branches y paths dentro del mismo evento se combinan con AND.
+# Solo se dispara con un push a develop QUE además toque algo en docs/.
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - "docs/**"
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Mostrar qué ha cambiado
+        run: |
+          echo "Push en ${{ github.ref_name }} que afecta a docs/"
+          ls -la docs/

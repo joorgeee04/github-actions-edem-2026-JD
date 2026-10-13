@@ -1,0 +1,23 @@
+# Ejercicio 2: Manejo de secretos
+# PREVIO: crear el secreto en GitHub -> Settings > Secrets and variables > Actions
+#         > New repository secret  ->  Nombre: MY_PASSWORD
+name: Ejercicio 2 - Manejo de secretos
+
+on:
+  workflow_dispatch:
+
+jobs:
+  login:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Simular login
+        # CLAVE: el secreto se pasa como variable de entorno al step,
+        # nunca escrito directamente en el comando.
+        env:
+          PASSWORD: ${{ secrets.MY_PASSWORD }}
+        run: |
+          if [ -z "$PASSWORD" ]; then
+            echo "El secreto MY_PASSWORD no está configurado" && exit 1
+          fi
+          echo "Haciendo login con la contraseña: $PASSWORD"   # en el log saldrá ***
+          echo "Longitud de la contraseña: ${#PASSWORD}"

@@ -1,0 +1,75 @@
+# Desafío final: pipeline de datos seguro y automatizado
+# PREVIO: crear el secreto DISCORD_WEBHOOK en Settings > Secrets and variables > Actions
+name: 20 - Desafío final
+
+on:
+  workflow_dispatch:
+    inputs:
+      tests_seguridad:
+        description: "¿Ejecutar los tests de seguridad?"
+        type: choice
+        options: ["si", "no"]
+        default: "si"
+
+jobs:
+  ci-seguridad:
+    name: CI y seguridad
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validar ventas.json
+        run: jq empty ventas.json && echo "ventas.json es un JSON válido"
+
+      - name: Instalar Python
+        if: inputs.tests_seguridad == 'si'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Escaneo de claves API expuestas
+        if: inputs.tests_seguridad == 'si'
+        run: python scripts/security_scan.py .
+
+  procesamiento:
+    name: Procesamiento (${{ matrix.entorno }})
+    needs: ci-seguridad
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        entorno: [staging, production]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generar reporte
+        run: |
+          TOTAL=$(jq '[.ventas[].importe] | add' ventas.json)
+          NUM=$(jq '.ventas | length' ventas.json)
+          {
+            echo "Reporte de ventas - entorno: ${{ matrix.entorno }}"
+            echo "Fecha: $(date -u)"
+            echo "Periodo: $(jq -r '.periodo' ventas.json)"
+            echo "Nº de ventas: $NUM"
+            echo "Importe total: $TOTAL"
+          } > reporte-${{ matrix.entorno }}.txt
+          cat reporte-${{ matrix.entorno }}.txt
+
+      # El nombre del artefacto debe ser único por cada ejecución de la matriz
+      - name: Subir reporte
+        uses: actions/upload-artifact@v4
+        with:
+          name: reporte-${{ matrix.entorno }}
+          path: reporte-${{ matrix.entorno }}.txt
+
+  notificacion:
+    name: Notificación de éxito
+    needs: [ci-seguridad, procesamiento]
+    if: success()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enviar notificación a Discord (simulada)
+        env:
+          WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          echo "Pipeline OK en ${{ github.repository }} (run #${{ github.run_number }})"
+          echo "Enviando notificación a: $WEBHOOK"

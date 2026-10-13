@@ -1,0 +1,27 @@
+# Ejercicio 1: Variables de entorno globales
+name: Ejercicio 1 - Variables de entorno globales
+
+on:
+  workflow_dispatch:
+
+# CLAVE: "env" a nivel de workflow -> la heredan TODOS los jobs y steps.
+# Prioridad: step env > job env > workflow env (el más específico gana).
+env:
+  CURSO: "EDEM 2026"
+  ENTORNO: "desarrollo"
+
+jobs:
+  job-a:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Usar la variable global (sintaxis de shell)
+        run: echo "Job A -> curso $CURSO en entorno $ENTORNO"
+
+  job-b:
+    runs-on: ubuntu-latest
+    # Sobrescribimos ENTORNO solo para este job
+    env:
+      ENTORNO: "produccion"
+    steps:
+      - name: Usar la variable global (sintaxis de expresión)
+        run: echo "Job B -> curso ${{ env.CURSO }} en entorno ${{ env.ENTORNO }}"

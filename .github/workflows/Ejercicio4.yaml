@@ -1,0 +1,32 @@
+# Ejercicio 4: Artefactos de construcción
+name: Ejercicio 4 - Artefactos
+
+on:
+  workflow_dispatch:
+
+jobs:
+  generar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Crear archivo
+        run: echo "Hola desde el job 1, generado el $(date)" > mensaje.txt
+
+      # CLAVE: cada job corre en una máquina distinta y limpia.
+      # Para pasar ficheros entre jobs hay que subirlos como artefacto.
+      - name: Subir artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: mi-mensaje
+          path: mensaje.txt
+
+  leer:
+    runs-on: ubuntu-latest
+    needs: generar          # espera a que el job 1 termine
+    steps:
+      - name: Descargar artefacto
+        uses: actions/download-artifact@v4
+        with:
+          name: mi-mensaje
+
+      - name: Mostrar contenido
+        run: cat mensaje.txt

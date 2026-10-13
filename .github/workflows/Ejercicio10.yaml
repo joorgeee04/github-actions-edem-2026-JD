@@ -1,0 +1,28 @@
+# Ejercicio 10: Aprobación manual y despliegue
+name: Ejercicio 10 - Build y Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: echo "Compilando la aplicación..."
+
+  deploy:
+    runs-on: ubuntu-latest
+    # CLAVE 1: needs -> solo arranca si build termina con éxito
+    needs: build
+    # CLAVE 2: if -> solo si el workflow lo lanzó una persona a mano
+    if: github.event_name == 'workflow_dispatch'
+    # CLAVE 3 (opcional): si en Settings > Environments configuras "production"
+    # con "Required reviewers", el job se pausa hasta que alguien lo apruebe.
+    environment: production
+    steps:
+      - name: Deploy
+        run: echo "Desplegando en producción (lanzado por ${{ github.actor }})"

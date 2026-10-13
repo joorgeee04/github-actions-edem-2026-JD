@@ -1,0 +1,23 @@
+# Ejercicio 6: Validación de JSON con una acción de la comunidad
+name: Ejercicio 6 - Validar JSON
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "data.json"
+
+permissions:
+  contents: read
+
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4   # sin checkout el runner no tiene el fichero
+
+      # CLAVE: "uses:" reutiliza acciones del Marketplace (owner/repo@versión)
+      - name: Validar data.json
+        uses: GrantBirki/json-yaml-validate@v3
+        with:
+          files: data.json

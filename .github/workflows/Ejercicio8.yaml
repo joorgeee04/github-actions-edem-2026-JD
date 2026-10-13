@@ -1,0 +1,18 @@
+# Ejercicio 8: Programación temporal (cron)
+name: Ejercicio 8 - Cron lunes 9:00
+
+on:
+  schedule:
+    # ┌ minuto  ┌ hora  ┌ día mes  ┌ mes  ┌ día semana (0=domingo, 1=lunes)
+    - cron: "0 9 * * 1"
+    # OJO: el cron de GitHub va en UTC. 9:00 UTC = 10:00/11:00 en España.
+    # Para las 9:00 hora española en invierno sería "0 8 * * 1".
+  workflow_dispatch:   # para poder probarlo sin esperar al lunes
+
+jobs:
+  semanal:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Tarea semanal
+        run: |
+          echo "Buenos días, es lunes. Ejecutado por: ${{ github.event_name }}"

@@ -1,0 +1,41 @@
+# Ejercicio 9: Contenedores de servicio (Postgres)
+name: Ejercicio 9 - Servicio Postgres
+
+on:
+  workflow_dispatch:
+
+env:
+  POSTGRES_USER: edem
+  POSTGRES_PASSWORD: edem_password
+  POSTGRES_DB: curso
+
+jobs:
+  db-test:
+    runs-on: ubuntu-latest
+    # CLAVE: "services" levanta contenedores auxiliares durante el job.
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+        ports:
+          - 5432:5432           # host:contenedor -> accesible en localhost:5432
+        # CLAVE: health check para que los steps no empiecen hasta que la BD esté lista
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Comprobar que Postgres responde
+        run: pg_isready -h localhost -p 5432 -U "$POSTGRES_USER"
+
+      - name: Ejecutar una consulta
+        env:
+          PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        run: |
+          psql -h localhost -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT version();"
+          psql -h localhost -U "$POSTGRES_USER" -d "$POSTGRES_DB" \
+               -c "CREATE TABLE alumnos(id serial, nombre text); INSERT INTO alumnos(nombre) VALUES ('Jorge'); SELECT * FROM alumnos;"
