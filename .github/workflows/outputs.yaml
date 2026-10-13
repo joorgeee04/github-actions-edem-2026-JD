@@ -1,8 +1,9 @@
 
+
 jobs:
   say_hello:
     name: "Let's greet the user!"
-    runs-on: ubuntu-latest
+    runs-on: ${{ variables.RUNS_ON }}
     steps:
       - id: get-time
         name: Grab the current time
