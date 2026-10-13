@@ -5,7 +5,7 @@ on:
 jobs:
   say_hello:
     name: "Let's greet the user!"
-    runs-on: ${{ variables.RUNS_ON }}
+    runs-on: ${{ vars.RUNS_ON }}
     steps:
       - id: get-time
         name: Grab the current time
