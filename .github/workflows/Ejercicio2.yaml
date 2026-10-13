@@ -11,13 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Simular login
-        # CLAVE: el secreto se pasa como variable de entorno al step,
-        # nunca escrito directamente en el comando.
+        # CLAVE: el secreto se pasa como variable de entorno al step
         env:
           PASSWORD: ${{ secrets.MY_PASSWORD }}
-        run: |
-          if [ -z "$PASSWORD" ]; then
-            echo "El secreto MY_PASSWORD no está configurado" && exit 1
-          fi
-          echo "Haciendo login con la contraseña: $PASSWORD"   # en el log saldrá ***
-          echo "Longitud de la contraseña: ${#PASSWORD}"
+        run: echo "Haciendo login con la contraseña $PASSWORD"   # en el log saldrá ***

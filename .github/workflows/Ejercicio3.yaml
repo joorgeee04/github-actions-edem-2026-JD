@@ -23,4 +23,5 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Ejecutar tests
-        run: python -m unittest discover -s code/python -p "test_*.py" -v
+        working-directory: code/python   # equivale a hacer "cd code/python"
+        run: python -m unittest

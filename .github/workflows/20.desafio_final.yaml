@@ -29,7 +29,7 @@ jobs:
 
       - name: Escaneo de claves API expuestas
         if: inputs.tests_seguridad == 'si'
-        run: python scripts/security_scan.py .
+        run: python scripts/security_scan.py
 
   procesamiento:
     name: Procesamiento (${{ matrix.entorno }})
@@ -43,16 +43,8 @@ jobs:
 
       - name: Generar reporte
         run: |
-          TOTAL=$(jq '[.ventas[].importe] | add' ventas.json)
-          NUM=$(jq '.ventas | length' ventas.json)
-          {
-            echo "Reporte de ventas - entorno: ${{ matrix.entorno }}"
-            echo "Fecha: $(date -u)"
-            echo "Periodo: $(jq -r '.periodo' ventas.json)"
-            echo "Nº de ventas: $NUM"
-            echo "Importe total: $TOTAL"
-          } > reporte-${{ matrix.entorno }}.txt
-          cat reporte-${{ matrix.entorno }}.txt
+          echo "Reporte de ventas para ${{ matrix.entorno }}" > reporte-${{ matrix.entorno }}.txt
+          cat ventas.json >> reporte-${{ matrix.entorno }}.txt
 
       # El nombre del artefacto debe ser único por cada ejecución de la matriz
       - name: Subir reporte
